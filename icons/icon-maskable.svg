@@ -1,0 +1,32 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="512" height="512">
+<defs>
+ <radialGradient id="bg" cx="50%" cy="42%" r="70%"><stop offset="0" stop-color="#23826f"/><stop offset="1" stop-color="#0e463e"/></radialGradient>
+ <radialGradient id="plate" cx="45%" cy="38%" r="70%"><stop offset="0" stop-color="#fffdf7"/><stop offset="1" stop-color="#f6e9d6"/></radialGradient>
+</defs>
+<g>
+ <rect width="512" height="512" fill="url(#bg)"/>
+ <g fill="none" stroke="#fff" stroke-opacity=".09" stroke-width="5"><g transform="translate(64 64)"><path d="M0-30c9 11 9 20 0 30c-9-10-9-19 0-30zM0 30c9-11 9-20 0-30c-9 10-9 19 0 30zM-30 0c11-9 20-9 30 0c-10 9-19 9-30 0zM30 0c-11-9-20-9-30 0c10 9 19 9 30 0z"/></g><g transform="translate(64 192)"><path d="M0-30c9 11 9 20 0 30c-9-10-9-19 0-30zM0 30c9-11 9-20 0-30c-9 10-9 19 0 30zM-30 0c11-9 20-9 30 0c-10 9-19 9-30 0zM30 0c-11-9-20-9-30 0c10 9 19 9 30 0z"/></g><g transform="translate(64 320)"><path d="M0-30c9 11 9 20 0 30c-9-10-9-19 0-30zM0 30c9-11 9-20 0-30c-9 10-9 19 0 30zM-30 0c11-9 20-9 30 0c-10 9-19 9-30 0zM30 0c-11-9-20-9-30 0c10 9 19 9 30 0z"/></g><g transform="translate(64 448)"><path d="M0-30c9 11 9 20 0 30c-9-10-9-19 0-30zM0 30c9-11 9-20 0-30c-9 10-9 19 0 30zM-30 0c11-9 20-9 30 0c-10 9-19 9-30 0zM30 0c-11-9-20-9-30 0c10 9 19 9 30 0z"/></g><g transform="translate(192 64)"><path d="M0-30c9 11 9 20 0 30c-9-10-9-19 0-30zM0 30c9-11 9-20 0-30c-9 10-9 19 0 30zM-30 0c11-9 20-9 30 0c-10 9-19 9-30 0zM30 0c-11-9-20-9-30 0c10 9 19 9 30 0z"/></g><g transform="translate(192 192)"><path d="M0-30c9 11 9 20 0 30c-9-10-9-19 0-30zM0 30c9-11 9-20 0-30c-9 10-9 19 0 30zM-30 0c11-9 20-9 30 0c-10 9-19 9-30 0zM30 0c-11-9-20-9-30 0c10 9 19 9 30 0z"/></g><g transform="translate(192 320)"><path d="M0-30c9 11 9 20 0 30c-9-10-9-19 0-30zM0 30c9-11 9-20 0-30c-9 10-9 19 0 30zM-30 0c11-9 20-9 30 0c-10 9-19 9-30 0zM30 0c-11-9-20-9-30 0c10 9 19 9 30 0z"/></g><g transform="translate(192 448)"><path d="M0-30c9 11 9 20 0 30c-9-10-9-19 0-30zM0 30c9-11 9-20 0-30c-9 10-9 19 0 30zM-30 0c11-9 20-9 30 0c-10 9-19 9-30 0zM30 0c-11-9-20-9-30 0c10 9 19 9 30 0z"/></g><g transform="translate(320 64)"><path d="M0-30c9 11 9 20 0 30c-9-10-9-19 0-30zM0 30c9-11 9-20 0-30c-9 10-9 19 0 30zM-30 0c11-9 20-9 30 0c-10 9-19 9-30 0zM30 0c-11-9-20-9-30 0c10 9 19 9 30 0z"/></g><g transform="translate(320 192)"><path d="M0-30c9 11 9 20 0 30c-9-10-9-19 0-30zM0 30c9-11 9-20 0-30c-9 10-9 19 0 30zM-30 0c11-9 20-9 30 0c-10 9-19 9-30 0zM30 0c-11-9-20-9-30 0c10 9 19 9 30 0z"/></g><g transform="translate(320 320)"><path d="M0-30c9 11 9 20 0 30c-9-10-9-19 0-30zM0 30c9-11 9-20 0-30c-9 10-9 19 0 30zM-30 0c11-9 20-9 30 0c-10 9-19 9-30 0zM30 0c-11-9-20-9-30 0c10 9 19 9 30 0z"/></g><g transform="translate(320 448)"><path d="M0-30c9 11 9 20 0 30c-9-10-9-19 0-30zM0 30c9-11 9-20 0-30c-9 10-9 19 0 30zM-30 0c11-9 20-9 30 0c-10 9-19 9-30 0zM30 0c-11-9-20-9-30 0c10 9 19 9 30 0z"/></g><g transform="translate(448 64)"><path d="M0-30c9 11 9 20 0 30c-9-10-9-19 0-30zM0 30c9-11 9-20 0-30c-9 10-9 19 0 30zM-30 0c11-9 20-9 30 0c-10 9-19 9-30 0zM30 0c-11-9-20-9-30 0c10 9 19 9 30 0z"/></g><g transform="translate(448 192)"><path d="M0-30c9 11 9 20 0 30c-9-10-9-19 0-30zM0 30c9-11 9-20 0-30c-9 10-9 19 0 30zM-30 0c11-9 20-9 30 0c-10 9-19 9-30 0zM30 0c-11-9-20-9-30 0c10 9 19 9 30 0z"/></g><g transform="translate(448 320)"><path d="M0-30c9 11 9 20 0 30c-9-10-9-19 0-30zM0 30c9-11 9-20 0-30c-9 10-9 19 0 30zM-30 0c11-9 20-9 30 0c-10 9-19 9-30 0zM30 0c-11-9-20-9-30 0c10 9 19 9 30 0z"/></g><g transform="translate(448 448)"><path d="M0-30c9 11 9 20 0 30c-9-10-9-19 0-30zM0 30c9-11 9-20 0-30c-9 10-9 19 0 30zM-30 0c11-9 20-9 30 0c-10 9-19 9-30 0zM30 0c-11-9-20-9-30 0c10 9 19 9 30 0z"/></g>
+  <path d="M128 0V512M256 0V512M384 0V512M0 128H512M0 256H512M0 384H512" stroke-width="3"/></g>
+ <!-- plate: gold rim, nyonya pink dashed ring -->
+ <circle cx="256" cy="268" r="176" fill="#0b3a33" opacity=".45"/>
+ <circle cx="256" cy="256" r="176" fill="#e5b44f"/>
+ <circle cx="256" cy="256" r="160" fill="#f28bb0"/>
+ <circle cx="256" cy="256" r="146" fill="url(#plate)"/>
+ <circle cx="256" cy="256" r="153" fill="none" stroke="#c9507e" stroke-width="4" stroke-dasharray="10 8"/>
+ <!-- ang ku kueh, the hero -->
+ <g transform="translate(256 262) scale(2.55) translate(-50 -52)">
+  <ellipse cx="50" cy="60" rx="42" ry="33" fill="#7d1427" opacity=".35"/>
+  <ellipse cx="50" cy="58" rx="42" ry="33" fill="#9e1d34"/>
+  <ellipse cx="50" cy="52" rx="42" ry="33" fill="#e0344f"/>
+  <ellipse cx="50" cy="52" rx="28" ry="21" fill="none" stroke="#ff8a9c" stroke-width="3"/>
+  <path d="M50 32v40M30 44l40 16M30 60l40-16" stroke="#b5243b" stroke-width="3" stroke-linecap="round"/>
+  <circle cx="50" cy="52" r="6" fill="#ff8a9c"/>
+  <ellipse cx="32" cy="34" rx="10" ry="5" fill="#fff" opacity=".5" transform="rotate(-20 32 34)"/>
+ </g>
+ <g fill="#ffe08a">
+  <path transform="translate(360 150) scale(1.1)" d="M0-22C3-6 6-3 22 0C6 3 3 6 0 22C-3 6-6 3-22 0C-6-3-3-6 0-22z"/>
+  <path transform="translate(150 360) scale(.7)" d="M0-22C3-6 6-3 22 0C6 3 3 6 0 22C-3 6-6 3-22 0C-6-3-3-6 0-22z"/>
+  <path transform="translate(372 352) scale(.55)" d="M0-22C3-6 6-3 22 0C6 3 3 6 0 22C-3 6-6 3-22 0C-6-3-3-6 0-22z"/>
+ </g>
+</g>
+</svg>

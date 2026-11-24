@@ -1,0 +1,460 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover,user-scalable=no">
+<title>Kueh Crush</title>
+<meta name="description" content="A 60-second Peranakan kueh-matching game from Livac Designs. Score 2,500 to unlock 10% off.">
+<meta name="theme-color" content="#17675b">
+<link rel="manifest" href="/manifest.webmanifest">
+<link rel="icon" href="/icons/icon.svg" type="image/svg+xml">
+<link rel="icon" href="/icons/favicon-32.png" sizes="32x32" type="image/png">
+<link rel="apple-touch-icon" href="/icons/apple-touch-icon.png">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="Kueh Crush">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Rozha+One&family=Nunito:wght@600;800;900&display=swap" rel="stylesheet">
+<style>
+/* VOICE: warm, playful, colloquial Singapore — a kopitiam treat, not a casino
+   IDEA: a Peranakan tiled tray of kueh, framed in gold like a nyonya tiffin lid
+   PICTURE: the 8x8 board itself, hand-drawn kueh sprites on a jade tile ground
+   COLOUR and TYPE: jade field, nyonya pink support, gold accent; Rozha One + Nunito
+   LAYOUT: modest title, HUD strip, board, booster row; overlays for intro and results */
+:root{color-scheme:light dark;--jade:#17675b;--jade-d:#0e463e;--pink:#f28bb0;--pink-d:#c9507e;--gold:#e5b44f;--paper:#fff8ef;--ink:#20332f}
+:root[data-theme=light]{color-scheme:light}:root[data-theme=dark]{color-scheme:dark}
+*{box-sizing:border-box;min-width:0;-webkit-tap-highlight-color:transparent}
+html,body{height:100%;overscroll-behavior:none}
+body{margin:0;background:var(--jade);color:var(--paper);font:16px/1.45 Nunito,system-ui,sans-serif;overflow:hidden;touch-action:manipulation;user-select:none;-webkit-user-select:none;
+background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='72' height='72' viewBox='0 0 72 72'%3E%3Cg fill='none' stroke='%23ffffff' stroke-opacity='.07' stroke-width='2'%3E%3Cpath d='M36 8c8 10 8 18 0 28c-8-10-8-18 0-28zM36 64c8-10 8-18 0-28c-8 10-8 18 0 28zM8 36c10-8 18-8 28 0c-10 8-18 8-28 0zM64 36c-10-8-18-8-28 0c10 8 18 8 28 0z'/%3E%3Crect x='1' y='1' width='70' height='70'/%3E%3C/g%3E%3C/svg%3E")}
+.app{height:100%;max-width:580px;margin:0 auto;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:10px;
+padding:max(12px,env(safe-area-inset-top)) max(12px,env(safe-area-inset-right)) max(14px,env(safe-area-inset-bottom)) max(12px,env(safe-area-inset-left))}
+header{width:100%;display:flex;align-items:center;justify-content:space-between;gap:12px}
+h1{font:400 clamp(30px,8vw,40px)/1.05 "Rozha One",serif;margin:0;color:var(--paper)}
+h1 small{display:block;font:800 13px/1.3 Nunito,sans-serif;color:var(--gold);letter-spacing:.02em}
+.icon-btn{width:44px;height:44px;border-radius:50%;border:2px solid rgba(255,255,255,.35);background:var(--jade-d);color:var(--paper);display:grid;place-items:center;cursor:pointer}
+.icon-btn svg{width:22px;height:22px}
+.hud{width:100%;display:grid;grid-template-columns:auto minmax(0,1fr);gap:10px 14px;align-items:center;background:var(--jade-d);border-radius:16px;padding:10px 14px;border:2px solid rgba(229,180,79,.5)}
+.clock{grid-row:span 2;width:62px;height:62px;border-radius:50%;display:grid;place-items:center;font:900 24px/1 Nunito;color:var(--ink);background:conic-gradient(var(--gold) calc(var(--p,1)*360deg),rgba(255,255,255,.15) 0);position:relative}
+.clock::before{content:"";position:absolute;inset:6px;border-radius:50%;background:var(--paper)}
+.clock span{position:relative}
+.clock.low span{color:#c7223f;animation:pulse .5s ease-in-out infinite alternate}
+@keyframes pulse{to{transform:scale(1.15)}}
+.score-row{display:flex;justify-content:space-between;align-items:baseline;gap:8px}
+.score{font:900 28px/1 Nunito;font-variant-numeric:tabular-nums}
+.label{font-size:13px;font-weight:800;color:#bfe0d8}
+.goal{position:relative;height:12px;border-radius:8px;background:rgba(255,255,255,.15);overflow:hidden}
+.goal i{position:absolute;inset:0 auto 0 0;width:0;background:linear-gradient(90deg,var(--pink),var(--gold));border-radius:8px;transition:width .3s}
+.goal.done i{background:var(--gold)}
+.frame{position:relative;padding:7px;border-radius:18px;background:var(--gold);box-shadow:0 10px 0 var(--jade-d),0 14px 30px rgba(0,0,0,.35)}
+.frame::before{content:"";position:absolute;inset:3px;border-radius:15px;border:2px dashed var(--pink-d);pointer-events:none}
+#board{position:relative;width:min(94vw,calc(100vh - 290px),530px);width:min(94vw,calc(100dvh - 290px),530px);aspect-ratio:1;border-radius:12px;overflow:hidden;touch-action:none;
+background:repeating-conic-gradient(#e3f2ec 0 25%,#d0e8e0 0 50%) 0 0/25% 25%}
+#board.aim{cursor:crosshair;box-shadow:inset 0 0 0 4px var(--pink-d)}
+.t{position:absolute;left:0;top:0;width:12.5%;height:12.5%;transition:transform .22s cubic-bezier(.3,.7,.4,1.1),opacity .2s;will-change:transform}
+.t svg{width:100%;height:100%;display:block;transition:transform .15s;filter:drop-shadow(0 2px 1px rgba(0,0,0,.18))}
+.t.sel svg{transform:scale(1.16);filter:drop-shadow(0 0 4px #fff) drop-shadow(0 0 2px var(--pink-d))}
+.t.pop svg{transform:scale(0) rotate(40deg);transition:transform .2s ease-in}
+.float{position:absolute;transform:translate(-50%,-50%);font:900 22px/1 Nunito;color:#fff;text-shadow:0 2px 0 var(--pink-d),0 0 8px rgba(0,0,0,.4);pointer-events:none;animation:rise .9s ease-out forwards;white-space:nowrap;z-index:5}
+.float.big{font-size:30px;color:var(--gold);text-shadow:0 3px 0 var(--jade-d),0 0 10px rgba(0,0,0,.4)}
+@keyframes rise{0%{opacity:0;margin-top:10px;scale:.6}20%{opacity:1;scale:1.1}100%{opacity:0;margin-top:-50px;scale:1}}
+.boosts{display:flex;gap:10px;width:100%;justify-content:center}
+.boost{position:relative;flex:1;max-width:140px;min-height:56px;border-radius:14px;border:0;background:var(--pink);color:var(--ink);font:800 14px/1.1 Nunito;display:flex;align-items:center;justify-content:center;gap:6px;cursor:pointer;box-shadow:0 4px 0 var(--pink-d)}
+.boost svg{width:24px;height:24px;flex:none}
+.boost:active{transform:translateY(3px);box-shadow:0 1px 0 var(--pink-d)}
+.boost b{position:absolute;top:-7px;right:-5px;min-width:22px;height:22px;border-radius:11px;background:var(--gold);color:var(--ink);font-size:13px;display:grid;place-items:center;border:2px solid var(--jade)}
+.boost:disabled{opacity:.4;cursor:default;box-shadow:none;transform:none}
+.boost.on{background:var(--gold);box-shadow:0 4px 0 #a97c1e}
+button:focus-visible{outline:3px solid #fff;outline-offset:2px}
+.toast{position:fixed;left:50%;top:max(16px,env(safe-area-inset-top));transform:translate(-50%,-20px);opacity:0;pointer-events:none;transition:transform .3s,opacity .3s;background:var(--paper);color:var(--ink);font-weight:800;padding:10px 18px;border-radius:24px;box-shadow:0 6px 20px rgba(0,0,0,.3);z-index:30;white-space:nowrap}
+.toast.show{transform:translate(-50%,0);opacity:1}
+.overlay{position:fixed;inset:0;display:grid;place-items:center;padding:16px;background:rgba(9,40,35,.72);z-index:20;overflow:auto}
+.overlay[hidden]{display:none}
+.card{width:min(440px,100%);background:var(--paper);color:var(--ink);border-radius:22px;padding:24px 22px 22px;text-align:center;border:6px solid var(--gold);box-shadow:0 0 0 3px var(--pink-d),0 20px 50px rgba(0,0,0,.4)}
+.card h2{font:400 clamp(32px,9vw,44px)/1.05 "Rozha One",serif;margin:0 0 4px;color:var(--jade)}
+.card p{margin:8px 0}
+.lineup{display:grid;grid-template-columns:repeat(6,minmax(0,1fr));gap:4px;margin:14px 0 6px}
+.lineup figure{margin:0;font-size:11px;font-weight:800;line-height:1.15;color:#53625f}
+.lineup svg{width:100%;aspect-ratio:1;display:block}
+.steps{text-align:left;margin:14px 0;padding:0;list-style:none;display:grid;gap:10px}
+.steps li{display:grid;grid-template-columns:34px minmax(0,1fr);gap:10px;align-items:start;font-size:15px}
+.steps li span{width:34px;height:34px;border-radius:50%;background:var(--pink);display:grid;place-items:center;font-weight:900}
+.cta{display:block;width:100%;min-height:54px;border:0;border-radius:16px;background:var(--jade);color:var(--paper);font:900 19px/1 Nunito;cursor:pointer;box-shadow:0 5px 0 var(--jade-d);margin-top:14px}
+.cta:active{transform:translateY(3px);box-shadow:0 2px 0 var(--jade-d)}
+.final{font:900 56px/1 Nunito;color:var(--jade);margin:6px 0}
+.code{margin:14px 0 4px;border:3px dashed var(--pink-d);border-radius:16px;padding:14px;background:#ffe6ef}
+.code strong{display:block;font:900 32px/1.1 Nunito;letter-spacing:.06em;color:var(--pink-d);user-select:all;-webkit-user-select:all}
+.copy{margin-top:10px;min-height:44px;padding:0 20px;border-radius:22px;border:0;background:var(--pink-d);color:#fff;font:800 15px Nunito;cursor:pointer}
+.small{font-size:13px;color:#5b6a67}
+.install{margin-top:10px;width:100%;min-height:48px;border-radius:16px;border:2px solid var(--jade);background:transparent;color:var(--jade);font:800 16px Nunito;cursor:pointer}
+.install[hidden],.ios-hint[hidden]{display:none}
+.ios-hint{margin:10px 0 0;font-size:13px;color:#5b6a67}
+@media(prefers-reduced-motion:reduce){.t{transition-duration:.08s}.float{animation-duration:.5s}.clock.low span{animation:none}}
+@media(max-height:640px){.hud{padding:6px 12px}.clock{width:50px;height:50px;font-size:20px}h1{font-size:28px}.boost{min-height:48px}}
+</style>
+</head>
+<body>
+<svg width="0" height="0" style="position:absolute" aria-hidden="true">
+<defs>
+ <!-- 0 Ang ku kueh -->
+ <symbol id="k0" viewBox="0 0 100 100">
+  <ellipse cx="50" cy="58" rx="42" ry="33" fill="#9e1d34"/>
+  <ellipse cx="50" cy="52" rx="42" ry="33" fill="#e0344f"/>
+  <ellipse cx="50" cy="52" rx="28" ry="21" fill="none" stroke="#ff8a9c" stroke-width="3"/>
+  <path d="M50 32v40M30 44l40 16M30 60l40-16" stroke="#b5243b" stroke-width="3" stroke-linecap="round"/>
+  <circle cx="50" cy="52" r="6" fill="#ff8a9c"/>
+  <ellipse cx="32" cy="34" rx="10" ry="5" fill="#fff" opacity=".45" transform="rotate(-20 32 34)"/>
+ </symbol>
+ <!-- 1 Ondeh-ondeh -->
+ <symbol id="k1" viewBox="0 0 100 100">
+  <circle cx="50" cy="55" r="36" fill="#2b7a36"/>
+  <circle cx="50" cy="51" r="36" fill="#47ad52"/>
+  <g fill="#fffdf4"><rect x="34" y="20" width="9" height="3" rx="1.5" transform="rotate(25 38 21)"/><rect x="50" y="17" width="10" height="3" rx="1.5" transform="rotate(-15 55 18)"/><rect x="62" y="24" width="9" height="3" rx="1.5" transform="rotate(40 66 25)"/><rect x="25" y="32" width="8" height="3" rx="1.5" transform="rotate(-30 29 33)"/><rect x="44" y="28" width="9" height="3" rx="1.5" transform="rotate(60 48 29)"/><rect x="70" y="36" width="8" height="3" rx="1.5" transform="rotate(-50 74 37)"/><rect x="57" y="33" width="8" height="3" rx="1.5" transform="rotate(10 61 34)"/><rect x="36" y="38" width="7" height="3" rx="1.5" transform="rotate(-70 39 39)"/></g>
+  <ellipse cx="34" cy="48" rx="7" ry="11" fill="#fff" opacity=".25"/>
+ </symbol>
+ <!-- 2 Kueh salat -->
+ <symbol id="k2" viewBox="0 0 100 100">
+  <rect x="14" y="24" width="72" height="62" rx="8" fill="#1f3b8f"/>
+  <rect x="14" y="44" width="72" height="38" rx="6" fill="#3b63d6"/>
+  <g fill="#c9d6ff"><circle cx="26" cy="56" r="2.5"/><circle cx="40" cy="68" r="2.5"/><circle cx="55" cy="58" r="2.5"/><circle cx="70" cy="70" r="2.5"/><circle cx="76" cy="54" r="2.5"/><circle cx="30" cy="74" r="2.5"/><circle cx="62" cy="76" r="2"/></g>
+  <rect x="14" y="18" width="72" height="30" rx="8" fill="#cfd96a"/>
+  <rect x="14" y="18" width="72" height="12" rx="6" fill="#e6ee8f"/>
+  <rect x="22" y="22" width="22" height="4" rx="2" fill="#fff" opacity=".6"/>
+ </symbol>
+ <!-- 3 Pineapple tart -->
+ <symbol id="k3" viewBox="0 0 100 100">
+  <circle cx="50" cy="56" r="38" fill="#b77a1f"/>
+  <circle cx="50" cy="52" r="38" fill="#f0bf55"/>
+  <circle cx="50" cy="52" r="30" fill="none" stroke="#d99a32" stroke-width="3" stroke-dasharray="6 5"/>
+  <circle cx="50" cy="50" r="18" fill="#e5762a"/>
+  <path d="M38 42l24 16M38 58l24-16M50 32v36" stroke="#f6a35c" stroke-width="3" stroke-linecap="round"/>
+  <circle cx="50" cy="38" r="3" fill="#6b3d12"/>
+  <ellipse cx="32" cy="34" rx="9" ry="4" fill="#fff" opacity=".45" transform="rotate(-30 32 34)"/>
+ </symbol>
+ <!-- 4 Kueh lapis -->
+ <symbol id="k4" viewBox="0 0 100 100">
+  <path d="M18 30l14-12h54l-14 12z" fill="#ffd3e2"/>
+  <path d="M72 30l14-12v58l-14 12z" fill="#c9507e"/>
+  <rect x="14" y="30" width="58" height="58" rx="3" fill="#fff1f5"/>
+  <g fill="#ee6f9c"><rect x="14" y="30" width="58" height="8"/><rect x="14" y="46" width="58" height="8"/><rect x="14" y="62" width="58" height="8"/><rect x="14" y="78" width="58" height="10" rx="3"/></g>
+  <rect x="20" y="40" width="16" height="3" rx="1.5" fill="#fff" opacity=".8"/>
+ </symbol>
+ <!-- 5 Kueh kosui -->
+ <symbol id="k5" viewBox="0 0 100 100">
+  <path d="M12 74c0-30 16-50 38-50s38 20 38 50z" fill="#4b2580"/>
+  <path d="M12 70c0-30 16-50 38-50s38 20 38 50c0 6-76 6-76 0z" fill="#8a52c9"/>
+  <path d="M24 34c8-10 18-14 26-14s18 4 26 14c-8 4-44 4-52 0z" fill="#fffdf4"/>
+  <g fill="#fffdf4"><circle cx="30" cy="40" r="2"/><circle cx="66" cy="39" r="2"/><circle cx="48" cy="41" r="1.8"/></g>
+  <ellipse cx="28" cy="54" rx="5" ry="10" fill="#fff" opacity=".25"/>
+ </symbol>
+ <symbol id="i-ham" viewBox="0 0 24 24"><path d="M14 3l7 7-3 3-7-7zM12.5 7.5L3 17l4 4 9.5-9.5" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linejoin="round"/></symbol>
+ <symbol id="i-shuf" viewBox="0 0 24 24"><path d="M3 7h4c5 0 5 10 10 10h4M3 17h4c2 0 3-1.5 4-3.5M15 9.5c1-1.5 2-2.5 3.5-2.5H21M18 4l3 3-3 3M18 14l3 3-3 3" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></symbol>
+ <symbol id="i-time" viewBox="0 0 24 24"><circle cx="12" cy="13" r="8" fill="none" stroke="currentColor" stroke-width="2.2"/><path d="M12 9v4l3 2M9 2h6" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"/></symbol>
+</defs>
+</svg>
+
+<div class="app">
+ <header>
+  <h1>Kueh Crush<small>by Livac Designs</small></h1>
+  <button class="icon-btn" id="mute" aria-label="Mute sound"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M4 9h4l5-4v14l-5-4H4z" fill="currentColor"/><path id="waves" d="M16.5 8.5a5 5 0 0 1 0 7M19 6a8.5 8.5 0 0 1 0 12"/></svg></button>
+ </header>
+ <div class="hud">
+  <div class="clock" id="clock"><span id="time">60</span></div>
+  <div class="score-row"><span class="label">Score</span><span class="score" id="score">0</span></div>
+  <div><div class="goal" id="goal"><i id="goalbar"></i></div><div class="label" id="goaltxt" style="margin-top:3px">Reach 2,500 to unlock 10% off</div></div>
+ </div>
+ <div class="frame"><div id="board" aria-label="Game board"></div></div>
+ <div class="boosts">
+  <button class="boost" id="b-hammer"><svg><use href="#i-ham"/></svg>Hammer<b>1</b></button>
+  <button class="boost" id="b-shuffle"><svg><use href="#i-shuf"/></svg>Shuffle<b>1</b></button>
+  <button class="boost" id="b-time"><svg><use href="#i-time"/></svg>+10 sec<b>1</b></button>
+ </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<div class="overlay" id="intro">
+ <div class="card">
+  <h2>Kueh Crush</h2>
+  <p>Match the kueh before the tiffin closes!</p>
+  <div class="lineup" id="lineup"></div>
+  <ul class="steps">
+   <li><span>1</span><div><b>Swipe</b> a kueh into its neighbour, or tap two side by side, to line up 3 or more of the same.</div></li>
+   <li><span>2</span><div>You have <b>60 seconds</b>. Chain reactions multiply your points. Shiok!</div></li>
+   <li><span>3</span><div>One of each booster per round: <b>Hammer</b> smashes any kueh, <b>Shuffle</b> remixes the tray, <b>+10 sec</b> buys time.</div></li>
+   <li><span>4</span><div>Score <b>2,500</b> to unlock a <b>10% off</b> code for Livac Designs.</div></li>
+  </ul>
+  <button class="cta" id="start">Start playing</button>
+  <button class="install" id="install" hidden>Install Kueh Crush on this phone</button>
+  <p class="ios-hint" id="iosHint" hidden>To install on iPhone: tap the <b>Share</b> button, then <b>Add to Home Screen</b>.</p>
+ </div>
+</div>
+
+<div class="overlay" id="end" hidden>
+ <div class="card">
+  <h2 id="endTitle">Time's up!</h2>
+  <div class="final" id="final">0</div>
+  <div id="endBody"></div>
+  <button class="cta" id="again">Play again</button>
+ </div>
+</div>
+
+<script>
+{
+const N=8, TYPES=6, ROUND=60, TARGET=2500, CODE='Kueh10', DISCOUNT='10% off';
+const NAMES=['Ang ku kueh','Ondeh-ondeh','Kueh salat','Pineapple tart','Kueh lapis','Kueh kosui'];
+const CHEERS=['','','Nice!','Shiok!','Power lah!','Wah, champion!'];
+const $=s=>document.querySelector(s);
+const board=$('#board');
+let grid=[], busy=false, running=false, score=0, timeLeft=ROUND, sel=null, aim=false, muted=false, unlocked=false, boosts={hammer:1,shuffle:1,time:1}, last=null, lastSec=ROUND, nid=0;
+
+$('#lineup').innerHTML=NAMES.map((n,i)=>`<figure><svg viewBox="0 0 100 100"><use href="#k${i}"/></svg>${n}</figure>`).join('');
+$('#goaltxt').textContent=`Reach ${TARGET.toLocaleString()} to unlock ${DISCOUNT}`;
+
+/* ---------- sound + haptics ---------- */
+let ac=null;
+function tone(f,d=.12,type='sine',vol=.18,delay=0,to=null){
+ if(muted) return;
+ try{
+  ac=ac||new (window.AudioContext||window.webkitAudioContext)();
+  const t=ac.currentTime+delay,o=ac.createOscillator(),g=ac.createGain();
+  o.type=type;o.frequency.setValueAtTime(f,t);if(to)o.frequency.exponentialRampToValueAtTime(to,t+d);
+  g.gain.setValueAtTime(vol,t);g.gain.exponentialRampToValueAtTime(.001,t+d);
+  o.connect(g).connect(ac.destination);o.start(t);o.stop(t+d+.02);
+ }catch(e){}
+}
+const sfx={
+ swap:()=>tone(520,.08,'triangle',.12,0,700),
+ nope:()=>{tone(220,.12,'square',.06,0,150);tone(180,.14,'square',.06,.1,120)},
+ pop:c=>{const f=523*Math.pow(2,Math.min(c-1,7)*2/12);tone(f,.16,'sine',.2);tone(f*1.5,.12,'triangle',.08,.04)},
+ boost:()=>tone(300,.3,'sawtooth',.07,0,1200),
+ tick:()=>tone(1000,.05,'square',.05),
+ win:()=>[523,659,784,1047].forEach((f,i)=>tone(f,.25,'triangle',.15,i*.1)),
+ end:()=>[784,659,523].forEach((f,i)=>tone(f,.3,'sine',.15,i*.15))
+};
+function buzz(ms){try{navigator.vibrate&&navigator.vibrate(ms)}catch(e){}}
+
+/* ---------- grid helpers ---------- */
+const wait=ms=>new Promise(r=>setTimeout(r,ms));
+const rnd=()=>Math.floor(Math.random()*TYPES);
+const typeAt=(r,c)=>(r>=0&&r<N&&c>=0&&c<N&&grid[r][c])?grid[r][c].type:-1;
+function place(t,r,c){t.r=r;t.c=c;t.el.style.transform=`translate(${c*100}%,${r*100}%)`}
+function makeTile(type,r,c){
+ const el=document.createElement('div');el.className='t';
+ el.innerHTML=`<svg viewBox="0 0 100 100"><use href="#k${type}"/></svg>`;
+ const t={id:nid++,type,el};place(t,r,c);board.appendChild(el);return t;
+}
+function runs(){
+ const out=[];
+ for(let r=0;r<N;r++){let c=0;while(c<N){const ty=typeAt(r,c);let e=c+1;while(e<N&&ty>=0&&typeAt(r,e)===ty)e++;if(ty>=0&&e-c>=3){const cells=[];for(let x=c;x<e;x++)cells.push([r,x]);out.push(cells)}c=e}}
+ for(let c=0;c<N;c++){let r=0;while(r<N){const ty=typeAt(r,c);let e=r+1;while(e<N&&ty>=0&&typeAt(e,c)===ty)e++;if(ty>=0&&e-r>=3){const cells=[];for(let y=r;y<e;y++)cells.push([y,c]);out.push(cells)}r=e}}
+ return out;
+}
+function hasMove(){
+ for(let r=0;r<N;r++)for(let c=0;c<N;c++)for(const [dr,dc] of [[0,1],[1,0]]){
+  const r2=r+dr,c2=c+dc;if(r2>=N||c2>=N)continue;
+  [grid[r][c],grid[r2][c2]]=[grid[r2][c2],grid[r][c]];
+  const ok=runs().length>0;
+  [grid[r][c],grid[r2][c2]]=[grid[r2][c2],grid[r][c]];
+  if(ok)return true;
+ }
+ return false;
+}
+function fill(){
+ board.innerHTML='';grid=[...Array(N)].map(()=>Array(N).fill(null));
+ for(let r=0;r<N;r++)for(let c=0;c<N;c++){
+  let t;do{t=rnd()}while((typeAt(r,c-1)===t&&typeAt(r,c-2)===t)||(typeAt(r-1,c)===t&&typeAt(r-2,c)===t));
+  grid[r][c]=makeTile(t,r,c);
+ }
+ if(!hasMove())fill();
+}
+
+/* ---------- core loop ---------- */
+function floatText(txt,r,c,big){
+ const d=document.createElement('div');d.className='float'+(big?' big':'');d.textContent=txt;
+ d.style.left=((c+.5)/N*100)+'%';d.style.top=((r+.5)/N*100)+'%';
+ board.appendChild(d);setTimeout(()=>d.remove(),950);
+}
+function gravity(){
+ for(let c=0;c<N;c++){
+  let w=N-1;
+  for(let r=N-1;r>=0;r--){const t=grid[r][c];if(t){grid[r][c]=null;grid[w][c]=t;place(t,w,c);w--}}
+  const missing=w+1;
+  for(let r=w;r>=0;r--){
+   const t=makeTile(rnd(),r-missing,c);t.el.offsetWidth;place(t,r,c);grid[r][c]=t;
+  }
+ }
+}
+async function resolve(){
+ let chain=0;
+ for(;;){
+  const rs=runs();if(!rs.length)break;
+  chain++;
+  const cells=new Map();let bonus=0;
+  for(const run of rs){for(const [r,c] of run)cells.set(r*N+c,[r,c]);if(run.length===4)bonus+=40;if(run.length>=5)bonus+=100}
+  const pts=(cells.size*10+bonus)*chain;
+  addScore(pts);
+  let sr=0,sc=0;for(const [r,c] of cells.values()){sr+=r;sc+=c}
+  floatText('+'+pts,sr/cells.size,sc/cells.size,false);
+  if(chain>=2)floatText(CHEERS[Math.min(chain,5)],3.5,3.5,true);
+  sfx.pop(chain);buzz(chain>1?[18,30,18]:15);
+  for(const [r,c] of cells.values()){const t=grid[r][c];t.el.classList.add('pop');setTimeout(()=>t.el.remove(),210);grid[r][c]=null}
+  await wait(200);gravity();await wait(270);
+ }
+ if(!hasMove()){toast('No moves left — reshuffling!');await shuffle()}
+}
+async function swap(r1,c1,r2,c2){
+ if(busy||!running)return;
+ busy=true;clearSel();
+ const A=grid[r1][c1],B=grid[r2][c2];
+ grid[r1][c1]=B;grid[r2][c2]=A;place(A,r2,c2);place(B,r1,c1);sfx.swap();
+ await wait(220);
+ if(runs().length)await resolve();
+ else{grid[r1][c1]=A;grid[r2][c2]=B;place(A,r1,c1);place(B,r2,c2);sfx.nope();buzz(40);await wait(220)}
+ busy=false;
+}
+async function shuffle(){
+ const all=grid.flat();
+ for(let tries=0;tries<300;tries++){
+  for(let i=all.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[all[i],all[j]]=[all[j],all[i]]}
+  for(let i=0;i<all.length;i++)grid[Math.floor(i/N)][i%N]=all[i];
+  if(!runs().length&&hasMove())break;
+ }
+ if(runs().length||!hasMove()){fill();return}
+ grid.forEach((row,r)=>row.forEach((t,c)=>place(t,r,c)));
+ await wait(320);
+}
+async function smash(r,c){
+ busy=true;setAim(false);
+ const t=grid[r][c];t.el.classList.add('pop');setTimeout(()=>t.el.remove(),210);grid[r][c]=null;
+ addScore(30);floatText('+30',r,c);sfx.boost();buzz(30);
+ await wait(200);gravity();await wait(270);await resolve();
+ busy=false;
+}
+function addScore(p){
+ score+=p;$('#score').textContent=score.toLocaleString();
+ $('#goalbar').style.width=Math.min(100,score/TARGET*100)+'%';
+ if(!unlocked&&score>=TARGET){
+  unlocked=true;$('#goal').classList.add('done');
+  $('#goaltxt').textContent=`${DISCOUNT} unlocked! Keep going for a high score`;
+  toast(`${DISCOUNT} unlocked — keep going!`);sfx.win();buzz([30,40,30,40,60]);
+ }
+}
+
+/* ---------- input: swipe or tap ---------- */
+let start=null;
+function cellFrom(e){const b=board.getBoundingClientRect();return[Math.floor((e.clientY-b.top)/b.height*N),Math.floor((e.clientX-b.left)/b.width*N)]}
+function clearSel(){if(sel){const t=grid[sel[0]][sel[1]];t&&t.el.classList.remove('sel')}sel=null}
+board.addEventListener('pointerdown',e=>{
+ if(!running||busy)return;
+ const [r,c]=cellFrom(e);if(r<0||r>=N||c<0||c>=N)return;
+ start={r,c,x:e.clientX,y:e.clientY};
+ try{board.setPointerCapture(e.pointerId)}catch(_){}
+});
+board.addEventListener('pointermove',e=>{
+ if(!start||aim)return;
+ const dx=e.clientX-start.x,dy=e.clientY-start.y,th=board.clientWidth/N*.35;
+ if(Math.max(Math.abs(dx),Math.abs(dy))<th)return;
+ const {r,c}=start;start=null;
+ const [r2,c2]=Math.abs(dx)>Math.abs(dy)?[r,c+Math.sign(dx)]:[r+Math.sign(dy),c];
+ if(r2>=0&&r2<N&&c2>=0&&c2<N)swap(r,c,r2,c2);
+});
+board.addEventListener('pointerup',()=>{if(!start)return;const {r,c}=start;start=null;tap(r,c)});
+board.addEventListener('pointercancel',()=>{start=null});
+function tap(r,c){
+ if(!running||busy)return;
+ if(aim){smash(r,c);return}
+ if(!sel){sel=[r,c];grid[r][c].el.classList.add('sel');sfx.tick();return}
+ const [sr,scc]=sel;
+ if(sr===r&&scc===c){clearSel();return}
+ if(Math.abs(sr-r)+Math.abs(scc-c)===1){swap(sr,scc,r,c);return}
+ clearSel();sel=[r,c];grid[r][c].el.classList.add('sel');
+}
+
+/* ---------- boosters ---------- */
+function setAim(on){aim=on;board.classList.toggle('aim',on);$('#b-hammer').classList.toggle('on',on);renderBoosts()}
+function renderBoosts(){for(const k of ['hammer','shuffle','time']){const b=$('#b-'+k);b.querySelector('b').textContent=boosts[k];b.disabled=!boosts[k]&&!(k==='hammer'&&aim)}}
+$('#b-hammer').addEventListener('click',()=>{
+ if(!running||busy)return;
+ if(aim){setAim(false);boosts.hammer++;renderBoosts();return}
+ if(!boosts.hammer)return;
+ boosts.hammer--;clearSel();setAim(true);renderBoosts();toast('Tap any kueh to smash it');
+});
+$('#b-shuffle').addEventListener('click',async()=>{
+ if(!running||busy||!boosts.shuffle)return;
+ boosts.shuffle--;renderBoosts();busy=true;clearSel();sfx.boost();
+ await shuffle();busy=false;
+});
+$('#b-time').addEventListener('click',()=>{
+ if(!running||!boosts.time)return;
+ boosts.time--;renderBoosts();timeLeft+=10;sfx.boost();buzz(25);
+ floatText('+10 sec',3.5,3.5,true);hud();
+});
+
+/* ---------- timer + flow ---------- */
+function hud(){
+ const s=Math.ceil(timeLeft);
+ $('#time').textContent=s;
+ $('#clock').style.setProperty('--p',Math.min(1,timeLeft/ROUND));
+ $('#clock').classList.toggle('low',s<=10&&running);
+ if(running&&s<lastSec&&s<=5&&s>0)sfx.tick();
+ lastSec=s;
+}
+function tick(ts){
+ if(!running)return;
+ if(last!==null)timeLeft-=Math.min(.1,(ts-last)/1000);
+ last=ts;
+ if(timeLeft<=0){timeLeft=0;running=false;setAim(false);clearSel();hud();finish();return}
+ hud();requestAnimationFrame(tick);
+}
+async function finish(){
+ while(busy)await wait(80);
+ sfx.end();buzz(80);
+ $('#final').textContent=score.toLocaleString();
+ if(unlocked){
+  $('#endTitle').textContent='Shiok, you did it!';
+  $('#endBody').innerHTML=`<p>You've earned <b>${DISCOUNT}</b> at Livac Designs.</p>
+   <div class="code"><span class="small">Your discount code</span><strong id="codeTxt">${CODE}</strong>
+   <button class="copy" id="copy">Copy code</button></div>
+   <p class="small">Enter it at checkout on the Livac Designs website.</p>`;
+  $('#copy').addEventListener('click',async e=>{
+   try{await navigator.clipboard.writeText(CODE);e.target.textContent='Copied!'}
+   catch(_){const s=getSelection(),rg=document.createRange();rg.selectNodeContents($('#codeTxt'));s.removeAllRanges();s.addRange(rg);e.target.textContent='Selected — copy it'}
+  });
+ }else{
+  const gap=TARGET-score;
+  $('#endTitle').textContent=gap<300?'So close!':"Time's up!";
+  $('#endBody').innerHTML=`<p>Just <b>${gap.toLocaleString()}</b> more points to unlock <b>${DISCOUNT}</b>.</p><p class="small">Tip: chain reactions multiply your points, and save +10 sec for the end.</p>`;
+ }
+ $('#end').hidden=false;$('#again').focus();
+}
+function newRound(){
+ score=0;timeLeft=ROUND;lastSec=ROUND;unlocked=false;busy=false;last=null;sel=null;
+ boosts={hammer:1,shuffle:1,time:1};setAim(false);renderBoosts();
+ $('#score').textContent='0';$('#goalbar').style.width='0';$('#goal').classList.remove('done');
+ $('#goaltxt').textContent=`Reach ${TARGET.toLocaleString()} to unlock ${DISCOUNT}`;
+ fill();hud();
+ running=true;requestAnimationFrame(tick);
+}
+let tt;
+function toast(msg){const t=$('#toast');t.textContent=msg;t.classList.add('show');clearTimeout(tt);tt=setTimeout(()=>t.classList.remove('show'),1800)}
+
+$('#start').addEventListener('click',()=>{$('#intro').hidden=true;tone(1,.01,'sine',.001);newRound()});
+$('#again').addEventListener('click',()=>{$('#end').hidden=true;newRound()});
+$('#mute').addEventListener('click',()=>{muted=!muted;$('#waves').style.display=muted?'none':'';$('#mute').setAttribute('aria-label',muted?'Unmute sound':'Mute sound')});
+document.addEventListener('visibilitychange',()=>{last=null});
+fill();hud();renderBoosts();
+
+/* ---------- installable app ---------- */
+const standalone=matchMedia('(display-mode: standalone)').matches||navigator.standalone===true;
+let installEvt=null;
+addEventListener('beforeinstallprompt',e=>{e.preventDefault();installEvt=e;if(!standalone)$('#install').hidden=false});
+$('#install').addEventListener('click',async()=>{if(!installEvt)return;installEvt.prompt();try{await installEvt.userChoice}catch(_){}installEvt=null;$('#install').hidden=true});
+addEventListener('appinstalled',()=>{$('#install').hidden=true;toast('Kueh Crush installed — find it on your home screen')});
+if(!standalone&&/iphone|ipad|ipod/i.test(navigator.userAgent))$('#iosHint').hidden=false;
+if('serviceWorker' in navigator&&location.protocol!=='file:'){addEventListener('load',()=>{navigator.serviceWorker.register('/sw.js').catch(()=>{})})}
+}
+</script>
+</body>
+</html>
